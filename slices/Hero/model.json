@@ -1,0 +1,54 @@
+{
+  "id": "hero",
+  "type": "SharedSlice",
+  "name": "Hero",
+  "description": "Homepage hero section",
+  "variations": [
+    {
+      "id": "default",
+      "name": "Default",
+      "docURL": "https://prismic.io/docs",
+      "version": "1.0.0",
+      "description": "Simple two-column hero with CTAs",
+      "primary": {
+        "eyebrow": {
+          "type": "Text",
+          "config": { "label": "Eyebrow" }
+        },
+        "heading": {
+          "type": "StructuredText",
+          "config": { "label": "Heading", "single": "heading1" }
+        },
+        "description": {
+          "type": "StructuredText",
+          "config": {
+            "label": "Description",
+            "multi": "paragraph, strong, em, hyperlink, list-item, o-list-item"
+          }
+        },
+        "primary_cta_label": {
+          "type": "Text",
+          "config": { "label": "Primary CTA Label" }
+        },
+        "primary_cta_link": {
+          "type": "Link",
+          "config": { "label": "Primary CTA Link" }
+        },
+        "secondary_cta_label": {
+          "type": "Text",
+          "config": { "label": "Secondary CTA Label" }
+        },
+        "secondary_cta_link": {
+          "type": "Link",
+          "config": { "label": "Secondary CTA Link" }
+        },
+        "illustration": {
+          "type": "Image",
+          "config": { "label": "Illustration" }
+        }
+      },
+      "items": {}
+    }
+  ]
+}
+

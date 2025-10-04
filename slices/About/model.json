@@ -1,0 +1,82 @@
+{
+  "id": "about",
+  "type": "SharedSlice",
+  "name": "About",
+  "description": "About me section",
+  "variations": [
+    {
+      "id": "default",
+      "name": "Default",
+      "docURL": "https://prismic.io/docs",
+      "version": "1.0.0",
+      "description": "Rich about section with image, content, skills, stats, and links",
+      "primary": {
+        "heading": {
+          "type": "StructuredText",
+          "config": { "label": "Heading", "single": "heading2" }
+        },
+        "subheading": {
+          "type": "Text",
+          "config": { "label": "Subheading / Tagline" }
+        },
+        "content": {
+          "type": "StructuredText",
+          "config": {
+            "label": "Content",
+            "multi": "paragraph, strong, em, hyperlink, list-item, o-list-item, preformatted"
+          }
+        },
+        "profile_image": {
+          "type": "Image",
+          "config": { "label": "Profile Image" }
+        },
+        "highlights": {
+          "type": "Group",
+          "config": {
+            "label": "Highlights",
+            "repeat": true,
+            "fields": {
+              "highlight": { "type": "Text", "config": { "label": "Highlight" } }
+            }
+          }
+        },
+        "stats": {
+          "type": "Group",
+          "config": {
+            "label": "Stats",
+            "repeat": true,
+            "fields": {
+              "label": { "type": "Text", "config": { "label": "Label" } },
+              "value": { "type": "Text", "config": { "label": "Value" } }
+            }
+          }
+        },
+        "resume_link": {
+          "type": "Link",
+          "config": { "label": "Resume Link" }
+        },
+        "contact_link": {
+          "type": "Link",
+          "config": { "label": "Contact Link" }
+        },
+        "socials": {
+          "type": "Group",
+          "config": {
+            "label": "Social Links",
+            "repeat": true,
+            "fields": {
+              "label": { "type": "Text", "config": { "label": "Label" } },
+              "url": { "type": "Link", "config": { "label": "URL" } }
+            }
+          }
+        }
+      },
+      "items": {
+        "skill": {
+          "type": "Text",
+          "config": { "label": "Skill" }
+        }
+      }
+    }
+  ]
+}

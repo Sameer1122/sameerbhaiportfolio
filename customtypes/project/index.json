@@ -1,0 +1,52 @@
+{
+  "id": "project",
+  "label": "Project",
+  "repeatable": true,
+  "status": true,
+  "json": {
+    "Main": {
+      "title": {
+        "type": "Text",
+        "config": { "label": "Title" }
+      },
+      "description": {
+        "type": "StructuredText",
+        "config": {
+          "label": "Description",
+          "multi": "paragraph, strong, em, hyperlink, list-item, o-list-item"
+        }
+      },
+      "thumbnail": {
+        "type": "Image",
+        "config": { "label": "Thumbnail" }
+      },
+      "live_url": {
+        "type": "Link",
+        "config": { "label": "Live URL" }
+      },
+      "repo_url": {
+        "type": "Link",
+        "config": { "label": "Repository URL" }
+      },
+      "year": {
+        "type": "Number",
+        "config": { "label": "Year" }
+      },
+      "accent_color": {
+        "type": "Text",
+        "config": { "label": "Accent Color (hex)" }
+      },
+      "tags": {
+        "type": "Group",
+        "config": {
+          "label": "Tags",
+          "repeat": true,
+          "fields": {
+            "tag": { "type": "Text", "config": { "label": "Tag" } }
+          }
+        }
+      }
+    }
+  }
+}
+
