@@ -1,36 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ChangeEvent, type FormEvent } from "react";
 
 type Payload = {
   name: string;
   email: string;
+  subject: string;
   message: string;
-  subject?: string;
   company?: string; // honeypot
 };
 
-export default function ContactForm() {
-  const [payload, setPayload] = useState<Payload>({
-    name: "",
-    email: "",
-    message: "",
-    subject: "",
-    company: "",
-  });
-  const [status, setStatus] = useState<
-    | { state: "idle" }
-    | { state: "loading" }
-    | { state: "success" }
-    | { state: "error"; message: string }
-  >({ state: "idle" });
+type SubmitState =
+  | { state: "idle" }
+  | { state: "loading" }
+  | { state: "success" }
+  | { state: "error"; message: string };
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
+const initialPayload: Payload = {
+  name: "",
+  email: "",
+  subject: "",
+  message: "",
+  company: "",
+};
+
+export default function ContactForm() {
+  const [payload, setPayload] = useState<Payload>(initialPayload);
+  const [status, setStatus] = useState<SubmitState>({ state: "idle" });
+
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     if (status.state === "loading") return;
-    if (payload.company) return; // honeypot
+    if (payload.company) return; // bots only
 
     setStatus({ state: "loading" });
+
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
@@ -40,61 +44,70 @@ export default function ContactForm() {
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data?.error || "Failed to send message");
+        throw new Error(typeof data?.error === "string" ? data.error : "Unable to send message");
       }
 
       setStatus({ state: "success" });
-      setPayload({ name: "", email: "", message: "", subject: "", company: "" });
-    } catch (err: any) {
-      setStatus({ state: "error", message: err?.message || "Something went wrong" });
+      setPayload(initialPayload);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Something went wrong";
+      setStatus({ state: "error", message });
     }
   }
 
+  function onChange<T extends keyof Payload>(key: T) {
+    return (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const value = event.target.value;
+      setPayload((prev) => ({ ...prev, [key]: value }));
+    };
+  }
+
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <div>
-        <label htmlFor="name" className="block text-sm font-medium">
-          Name
-        </label>
-        <input
-          id="name"
-          name="name"
-          required
-          value={payload.name}
-          onChange={(e) => setPayload((p) => ({ ...p, name: e.target.value }))}
-          className="mt-1 w-full rounded-xl border border-foreground/15 bg-background px-3 py-2 text-sm outline-none ring-0 transition focus:border-foreground/30"
-          placeholder="Your name"
-        />
+    <form onSubmit={onSubmit} className="space-y-4" noValidate>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label htmlFor="name" className="block text-xs font-semibold uppercase tracking-[0.25em] text-foreground/60">
+            Name
+          </label>
+          <input
+            id="name"
+            name="name"
+            required
+            value={payload.name}
+            onChange={onChange("name")}
+            placeholder="Jane Founder"
+            className="mt-2 w-full rounded-xl border border-foreground/15 bg-background px-3 py-2 text-sm outline-none transition focus:border-foreground/35"
+          />
+        </div>
+        <div>
+          <label htmlFor="email" className="block text-xs font-semibold uppercase tracking-[0.25em] text-foreground/60">
+            Email
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            inputMode="email"
+            required
+            value={payload.email}
+            onChange={onChange("email")}
+            placeholder="you@company.com"
+            className="mt-2 w-full rounded-xl border border-foreground/15 bg-background px-3 py-2 text-sm outline-none transition focus:border-foreground/35"
+          />
+        </div>
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium">
-          Email
-        </label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          inputMode="email"
-          required
-          value={payload.email}
-          onChange={(e) => setPayload((p) => ({ ...p, email: e.target.value }))}
-          className="mt-1 w-full rounded-xl border border-foreground/15 bg-background px-3 py-2 text-sm outline-none ring-0 transition focus:border-foreground/30"
-          placeholder="you@example.com"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="subject" className="block text-sm font-medium">
+        <label htmlFor="subject" className="block text-xs font-semibold uppercase tracking-[0.25em] text-foreground/60">
           Subject (optional)
         </label>
         <input
           id="subject"
           name="subject"
           value={payload.subject}
-          onChange={(e) => setPayload((p) => ({ ...p, subject: e.target.value }))}
-          className="mt-1 w-full rounded-xl border border-foreground/15 bg-background px-3 py-2 text-sm outline-none ring-0 transition focus:border-foreground/30"
-          placeholder="Quick chat about a project"
+          onChange={onChange("subject")}
+          placeholder="Architecture sprint or fractional leadership"
+          className="mt-2 w-full rounded-xl border border-foreground/15 bg-background px-3 py-2 text-sm outline-none transition focus:border-foreground/35"
         />
       </div>
 
@@ -104,14 +117,14 @@ export default function ContactForm() {
           id="company"
           name="company"
           value={payload.company}
-          onChange={(e) => setPayload((p) => ({ ...p, company: e.target.value }))}
+          onChange={onChange("company")}
           tabIndex={-1}
           autoComplete="off"
         />
       </div>
 
       <div>
-        <label htmlFor="message" className="block text-sm font-medium">
+        <label htmlFor="message" className="block text-xs font-semibold uppercase tracking-[0.25em] text-foreground/60">
           Message
         </label>
         <textarea
@@ -120,31 +133,25 @@ export default function ContactForm() {
           required
           rows={6}
           value={payload.message}
-          onChange={(e) => setPayload((p) => ({ ...p, message: e.target.value }))}
-          className="mt-1 w-full resize-y rounded-xl border border-foreground/15 bg-background px-3 py-2 text-sm outline-none ring-0 transition focus:border-foreground/30"
-          placeholder="Share details about your goals, timeline, and constraints."
+          onChange={onChange("message")}
+          placeholder="Share your goals, current constraints, and timelines."
+          className="mt-2 w-full rounded-xl border border-foreground/15 bg-background px-3 py-2 text-sm outline-none transition focus:border-foreground/35"
         />
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <button
           type="submit"
           disabled={status.state === "loading"}
-          className="inline-flex items-center justify-center rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background transition hover:opacity-90 disabled:opacity-60"
+          className="inline-flex items-center justify-center rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-background transition hover:opacity-90 disabled:opacity-60"
         >
-          {status.state === "loading" ? "Sending…" : "Send message"}
+          {status.state === "loading" ? "Sending..." : "Send message"}
         </button>
-        {status.state === "success" ? (
-          <span className="text-sm text-emerald-600 dark:text-emerald-400">
-            Thanks! I’ll get back to you shortly.
-          </span>
-        ) : status.state === "error" ? (
-          <span className="text-sm text-red-600 dark:text-red-400">
-            {status.message}
-          </span>
-        ) : null}
+        <div className="text-sm text-foreground/70" aria-live="polite">
+          {status.state === "success" && "Thanks for reaching out. I will reply within one business day."}
+          {status.state === "error" && status.message}
+        </div>
       </div>
     </form>
   );
 }
-
